@@ -1,0 +1,20 @@
+title exercise 0.6
+
+note over browser:
+field is filled
+submit clicked
+end note
+
+browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
+
+note over browser:
+adds new note to note array
+rerenders notes via js
+end note
+
+note over server:
+adds new note to note array
+with JSON data sent by HTTP POST
+end note
+
+server-->browser: 201 Created
