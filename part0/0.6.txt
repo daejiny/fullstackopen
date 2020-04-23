@@ -1,4 +1,4 @@
-title exercise 0.6
+title 0.6
 
 note over browser:
 field is filled
