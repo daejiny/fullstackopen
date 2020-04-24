@@ -40,7 +40,7 @@ const App = () => {
               setPersons(persons.map(person => person.id !== getIdFromName(newName) ? person : response.data))
             })
             .catch(error => {
-              const newError = { text: `${newName}'s number could not be updated`, success: 0 }
+              const newError = { text: `${error.response.data.error}`, success: 0 }
               setErrorMessage(newError)
               setTimeout(() => setErrorMessage(null), 3000)
             })
@@ -61,7 +61,7 @@ const App = () => {
         setPersons(persons.concat(response.data))
       })
       .catch(error => {
-        const newError = { text: `${newName} could not be added`, success: 0 }
+        const newError = { text: `${error.response.data.error}`, success: 0 }
         setErrorMessage(newError)
         setTimeout(() => setErrorMessage(null), 3000)
       })
@@ -78,7 +78,7 @@ const App = () => {
           setPersons(persons.filter(person => person.id !== id))
         })
         .catch(error => {
-          const newError = { text: `${getNameFromId(id)} could not be deleted as it has already been deleted`, success: 0 }
+          const newError = { text: `${error.response.data.error}`, success: 0 }
           setErrorMessage(newError)
           setTimeout(() => setErrorMessage(null), 3000)
           setPersons(persons.filter(person => person.name !== name))
