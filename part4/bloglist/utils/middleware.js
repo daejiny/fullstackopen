@@ -12,7 +12,20 @@ const unknownEndpoint = (req, res) => {
   res.status(404).send({ error: 'unknown endpoint' })
 }
 
+const errorHandler = (e, req, res, next) => {
+  logger.error(e.name, e.message)
+
+  if (e.name === 'CastError') {
+    return res.status(400).send({ error: 'bad id' })
+  } if (e.name === 'ValidationError') {
+    return res.status(400).json({ error: e.message })
+  }
+
+  next(e)
+}
+
 module.exports = {
   requestLogger,
-  unknownEndpoint
+  unknownEndpoint,
+  errorHandler
 }
