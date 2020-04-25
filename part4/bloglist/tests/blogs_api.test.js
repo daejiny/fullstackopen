@@ -6,6 +6,7 @@ const bcrypyt = require('bcrypt')
 const User = require('../models/user')
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
+const jwt = require('jsonwebtoken')
 
 
 beforeEach(async () => {
@@ -32,17 +33,25 @@ test('unique identifier is id', async () => {
 })
 
 test('new blog created', async () => {
-  const defaultUser = await User.findOne({ username: 'moon' })
   const newBlog = {
     title: 'The 100% Easy-2-Read Standard',
     author: 'Oliver Reichenstein',
     url: 'https://ia.net/topics/100e2r',
-    likes: 2,
-    userId: defaultUser.id
+    likes: 2
   }
+
+  const user = await User.findOne({ username: 'moon' })
+
+  const userForToken = {
+    username: user.username,
+    id: user._id
+  }
+
+  const token = jwt.sign(userForToken, process.env.SECRET)
 
   await api
     .post('/api/blogs')
+    .set('Authorization', `bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -55,16 +64,24 @@ test('new blog created', async () => {
 })
 
 test('default 0 likes', async () => {
-  const defaultUser = await User.findOne({ username: 'moon' })
   const newBlog = {
     title: 'The 100% Easy-2-Read Standard',
     author: 'Oliver Reichenstein',
-    url: 'https://ia.net/topics/100e2r',
-    userId: defaultUser.id
+    url: 'https://ia.net/topics/100e2r'
   }
+
+  const user = await User.findOne({ username: 'moon' })
+
+  const userForToken = {
+    username: user.username,
+    id: user._id
+  }
+
+  const token = jwt.sign(userForToken, process.env.SECRET)
 
   const newPost = await api
     .post('/api/blogs')
+    .set('Authorization', `bearer ${token}`)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -73,18 +90,43 @@ test('default 0 likes', async () => {
 })
 
 test('400 on empty title or url', async () => {
-  const defaultUser = await User.findOne({ username: 'moon' })
   const newBlog = {
     title: '',
     author: 'Oliver Reichenstein',
-    url: '',
-    userId: defaultUser.id
+    url: ''
+  }
+
+  const user = await User.findOne({ username: 'moon' })
+
+  const userForToken = {
+    username: user.username,
+    id: user._id
+  }
+
+  const token = jwt.sign(userForToken, process.env.SECRET)
+
+  await api
+    .post('/api/blogs')
+    .set('Authorization', `bearer ${token}`)
+    .send(newBlog)
+    .expect(400)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+})
+
+test('401 on missing token', async () => {
+  const newBlog = {
+    title: 'The 100% Easy-2-Read Standard',
+    author: 'Oliver Reichenstein',
+    url: 'https://ia.net/topics/100e2r'
   }
 
   await api
     .post('/api/blogs')
     .send(newBlog)
-    .expect(400)
+    .expect(401)
 
   const blogsAtEnd = await helper.blogsInDb()
 
