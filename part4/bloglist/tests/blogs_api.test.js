@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
+const bcrypyt = require('bcrypt')
+const User = require('../models/user')
 const Blog = require('../models/blog')
 const helper = require('./test_helper')
 
@@ -30,11 +32,13 @@ test('unique identifier is id', async () => {
 })
 
 test('new blog created', async () => {
+  const defaultUser = await User.findOne({ username: 'moon' })
   const newBlog = {
     title: 'The 100% Easy-2-Read Standard',
     author: 'Oliver Reichenstein',
     url: 'https://ia.net/topics/100e2r',
     likes: 2,
+    userId: defaultUser.id
   }
 
   await api
@@ -51,30 +55,30 @@ test('new blog created', async () => {
 })
 
 test('default 0 likes', async () => {
+  const defaultUser = await User.findOne({ username: 'moon' })
   const newBlog = {
     title: 'The 100% Easy-2-Read Standard',
     author: 'Oliver Reichenstein',
-    url: 'https://ia.net/topics/100e2r'
+    url: 'https://ia.net/topics/100e2r',
+    userId: defaultUser.id
   }
 
-  const poopy = await api
+  const newPost = await api
     .post('/api/blogs')
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-  expect(poopy.body.likes).toBe(0)
-})
-
-afterAll(() => {
-  mongoose.connection.close()
+  expect(newPost.body.likes).toBe(0)
 })
 
 test('400 on empty title or url', async () => {
+  const defaultUser = await User.findOne({ username: 'moon' })
   const newBlog = {
     title: '',
     author: 'Oliver Reichenstein',
-    url: ''
+    url: '',
+    userId: defaultUser.id
   }
 
   await api
@@ -85,6 +89,93 @@ test('400 on empty title or url', async () => {
   const blogsAtEnd = await helper.blogsInDb()
 
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+})
+
+describe('when there is initially one user in db', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypyt.hash('bingbong', 10)
+    const user = new User({ username: 'moon', name: 'moonmoon', passwordHash })
+
+    await user.save()
+  })
+
+  test('creation succeeds with a fresh username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'daejiny',
+      name: 'Dae Jin Yuk',
+      password: 'bingbong'
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(200)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map(u => u.username)
+    expect(usernames).toContain(newUser.username)
+  })
+
+  test('creation fails with a duplicate username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'moon',
+      name: 'nada',
+      password: 'bingbong'
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+
+  test('creation fails with a short username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'dj',
+      name: 'Dae Jin Yuk',
+      password: 'bingbong'
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+
+  test('creation fails with a short password', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'daejiny',
+      name: 'Dae Jin Yuk',
+      password: 'bb'
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
 })
 
 afterAll(() => {

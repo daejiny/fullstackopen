@@ -4,12 +4,17 @@ const User = require('../models/user')
 
 usersRouter.get('/', async (req, res) => {
   const users = await User.find({})
+    .populate('blogs')
 
   res.send(users.map(user => user.toJSON()))
 })
 
 usersRouter.post('/', async (req, res) => {
   const { body } = req
+
+  if (body.password.length < 3) {
+    return res.status(400).json({ error:'password too short' })
+  }
 
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(body.password, saltRounds)
@@ -20,7 +25,7 @@ usersRouter.post('/', async (req, res) => {
     passwordHash
   })
   const savedUser = await user.save()
-  res.json(savedUser.toJSON())
+  res.json(savedUser)
 })
 
 usersRouter.delete('/:id', async (req, res) => {
@@ -37,7 +42,7 @@ usersRouter.put('/:id', async (req, res) => {
     { passwordHash },
     { new: true })
 
-  res.json(updatedUser.toJSON())
+  res.json(updatedUser)
 })
 
 module.exports = usersRouter
