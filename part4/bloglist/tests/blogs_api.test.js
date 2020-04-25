@@ -14,7 +14,7 @@ beforeEach(async () => {
 
   for (const blog of helper.initialBlogs) {
     let blogObject = new Blog(blog)
-    blogObject.save()
+    await blogObject.save()
   }
 })
 
