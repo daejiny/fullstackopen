@@ -27,6 +27,7 @@ const LoginForm = ({ setUser, sendNotification }) => {
         <div>
           username
           <input
+            id='username'
             type="text"
             value={username}
             name="Username"
@@ -36,13 +37,14 @@ const LoginForm = ({ setUser, sendNotification }) => {
         <div>
           password
           <input
+            id='password'
             type="text"
             value={password}
             name="Password"
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" id='login-button'>Login</button>
       </form>
     </div>
   )

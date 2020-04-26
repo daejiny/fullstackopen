@@ -99,9 +99,9 @@ const App = () => {
     return (
       <div>
         <h2>blogs</h2>
-        <p>hello {user.name} <button onClick={() => handleLogout()}>Log Out</button></p>
+        <p>hello {user.name} <button onClick={() => handleLogout()} id='logout-button'>Log Out</button></p>
         {blogs.sort((a, b) => b.likes - a.likes).map(blog => <Blog key={blog.id} blog={blog} user={user} handleLike={handleLike} handleDelete={handleDelete} />)}
-        <Togglable buttonLabel='New Blog'>
+        <Togglable buttonLabel='New Blog' id='show-blog-form-button'>
           <BlogForm
             handleAdd={handleAdd}
           />

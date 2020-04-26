@@ -9,12 +9,12 @@ const Blog = ({ blog, user, handleLike, handleDelete }) => {
 
   return (
     <div className='blog' style={{ border: '1px solid black', padding: '1rem', margin: '1rem' }}>
-      {blog.title} {blog.author} <button onClick={toggleBlogInfo}>{blogInfoVisible ? 'hide' : 'show'}</button>
+      {blog.title} {blog.author} <button onClick={toggleBlogInfo} className='toggle-visible-button'>{blogInfoVisible ? 'hide' : 'show'}</button>
       <div style={showWhenVisible} className='togglableContent'>
         URL: <a href={blog.url}>{blog.url}</a><br />
-        Likes: {blog.likes}<button onClick={() => handleLike(blog)}>like</button><br />
+        <div className='likes-div'>Likes: {blog.likes}<button onClick={() => handleLike(blog)} className='like-button'>like</button><br /></div>
         User: {blog.user.name}<br />
-        <button style={{ display: blog.user.username === user.username ? '' : 'none' }} onClick={() => handleDelete(blog)}>remove</button>
+        <div className='delete-div'><button style={{ display: blog.user.username === user.username ? '' : 'none' }} onClick={() => handleDelete(blog)} className='delete-button'>remove</button></div>
       </div>
     </div>
   )
