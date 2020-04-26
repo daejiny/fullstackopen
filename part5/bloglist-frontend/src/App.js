@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 import LoginForm from './components/LoginForm'
 import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
@@ -63,11 +64,13 @@ const App = () => {
       <div>
         <h2>blogs</h2>
         <p>hello {user.name} <button onClick={() => handleLogout()}>Log Out</button></p>
-        {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
-        <BlogForm
-          setBlogs={setBlogs}
-          sendNotification={sendNotification}
-        />
+        {blogs.sort((a, b) => b.likes - a.likes).map(blog => <Blog key={blog.id} blog={blog} user={user} />)}
+        <Togglable buttonLabel='New Blog'>
+          <BlogForm
+            setBlogs={setBlogs}
+            sendNotification={sendNotification}
+          />
+        </Togglable>
       </div>
     )
   }

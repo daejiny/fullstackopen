@@ -7,13 +7,13 @@ const Notification = ({ message }) => {
         return (
             <div className="notification">
                 {message.text}
-            </div >
+            </div>
         )
     } else if (message.success === 0) {
         return (
             <div className="error">
                 {message.text}
-            </div >
+            </div>
         )
     }
 }
