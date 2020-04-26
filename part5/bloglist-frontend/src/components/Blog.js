@@ -30,8 +30,6 @@ const Blog = ({ blog, user }) => {
     }
   }
 
-  console.log(blog.user.username, user.username, blog.user.username === user.username )
-
   return (
     <div style={{ border: '1px solid black', padding: '1rem', margin: '1rem' }}>
       {blog.title} {blog.author} <button onClick={toggleBlogInfo}>{blogInfoVisible ? 'hide' : 'show'}</button>
@@ -39,7 +37,7 @@ const Blog = ({ blog, user }) => {
         URL: <a href={blog.url}>{blog.url}</a><br />
         Likes: {blogLikes}<button onClick={() => handleLike(blog)}>like</button><br />
         User: {blog.user.name}<br />
-        <button style={{display: blog.user.username === user.username ? '' : 'none'}} onClick={() => handleDelete(blog)}>remove</button>
+        <button style={{ display: blog.user.username === user.username ? '' : 'none' }} onClick={() => handleDelete(blog)}>remove</button>
       </div>
     </div>
   )

@@ -27,7 +27,7 @@ const BlogForm = ({ setBlogs, sendNotification }) => {
       <form onSubmit={handleBlogSubmit}>
         <div>
           title:
-        <input
+          <input
             type="text"
             value={blogTitle}
             name="Blog Title"
@@ -36,7 +36,7 @@ const BlogForm = ({ setBlogs, sendNotification }) => {
         </div>
         <div>
           author:
-        <input
+          <input
             type="text"
             value={blogAuthor}
             name="Blog Author"
@@ -45,7 +45,7 @@ const BlogForm = ({ setBlogs, sendNotification }) => {
         </div>
         <div>
           url:
-        <input
+          <input
             type="text"
             value={blogUrl}
             name="Blog URL"

@@ -31,7 +31,7 @@ const likeBlog = async blog => {
 
 const deleteBlog = async blog => {
   const config = {
-    headers: { Authorization: token}
+    headers: { Authorization: token }
   }
   await axios.delete(`${baseUrl}/${blog.id}`, config)
 }
