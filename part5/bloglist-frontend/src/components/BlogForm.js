@@ -1,33 +1,26 @@
 import React, { useState } from 'react'
-import blogService from '../services/blogs'
 
-const BlogForm = ({ setBlogs, sendNotification }) => {
+const BlogForm = ({ handleAdd }) => {
   const [blogTitle, setBlogTitle] = useState('')
   const [blogAuthor, setBlogAuthor] = useState('')
   const [blogUrl, setBlogUrl] = useState('')
 
-  const handleBlogSubmit = async (event) => {
+  const addBlog = async (event) => {
     event.preventDefault()
-
-    try {
-      await blogService.create({ title: blogTitle, author: blogAuthor, url: blogUrl })
-      const blogs = await blogService.getAll()
-      setBlogs(blogs)
+    if (await handleAdd({ title: blogTitle, author: blogAuthor, url: blogUrl }) === true) {
       setBlogAuthor('')
       setBlogTitle('')
       setBlogUrl('')
-      sendNotification(`Submitted ${blogTitle} by ${blogAuthor}`, 1)
-    } catch (e) {
-      sendNotification('Couldn\'t submit blog', 0)
     }
   }
 
   return (
     <div>
-      <form onSubmit={handleBlogSubmit}>
+      <form onSubmit={addBlog}>
         <div>
           title:
           <input
+            id='title'
             type="text"
             value={blogTitle}
             name="Blog Title"
@@ -37,6 +30,7 @@ const BlogForm = ({ setBlogs, sendNotification }) => {
         <div>
           author:
           <input
+            id='author'
             type="text"
             value={blogAuthor}
             name="Blog Author"
@@ -46,6 +40,7 @@ const BlogForm = ({ setBlogs, sendNotification }) => {
         <div>
           url:
           <input
+            id='url'
             type="text"
             value={blogUrl}
             name="Blog URL"

@@ -59,16 +59,51 @@ const App = () => {
     )
   }
 
+  const handleLike = async (b) => {
+    try {
+      await blogService.likeBlog(b)
+      setBlogs(
+        blogs.map(blog => (blog.id === b.id) ? { ...blog, likes: b.likes + 1 } : blog)
+      )
+    } catch (e) {
+      console.log('like blog failed')
+    }
+  }
+
+  const handleDelete = async (b) => {
+    try {
+      if (window.confirm(`Remove blog ${b.title} by ${b.author}?`)) {
+        await blogService.deleteBlog(b)
+        setBlogs(blogs.filter(blog => b.id !== blog.id))
+        sendNotification(`${b.title} deleted`, 1)
+      }
+    } catch (e) {
+      console.log('delete blog failed')
+    }
+  }
+
+  const handleAdd = async (b) => {
+    try {
+      await blogService.create(b)
+      const blogs = await blogService.getAll()
+      setBlogs(blogs)
+      sendNotification(`Submitted ${b.title} by ${b.author}`, 1)
+      return true
+    } catch (e) {
+      sendNotification('Couldn\'t submit blog', 0)
+      return false
+    }
+  }
+
   const blogList = () => {
     return (
       <div>
         <h2>blogs</h2>
         <p>hello {user.name} <button onClick={() => handleLogout()}>Log Out</button></p>
-        {blogs.sort((a, b) => b.likes - a.likes).map(blog => <Blog key={blog.id} blog={blog} user={user} />)}
+        {blogs.sort((a, b) => b.likes - a.likes).map(blog => <Blog key={blog.id} blog={blog} user={user} handleLike={handleLike} handleDelete={handleDelete} />)}
         <Togglable buttonLabel='New Blog'>
           <BlogForm
-            setBlogs={setBlogs}
-            sendNotification={sendNotification}
+            handleAdd={handleAdd}
           />
         </Togglable>
       </div>
