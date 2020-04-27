@@ -3,9 +3,6 @@ const initialNotification = { text: 'welcome', visible: true }
 const initialState = initialNotification
 
 const notificationReducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
-
   switch (action.type) {
     case 'NOTIFY':
       return { text: action.data.text, visible: true }
@@ -16,12 +13,23 @@ const notificationReducer = (state = initialState, action) => {
   }
 }
 
-export const setNotification = (text) => (
-  {
-    type: 'NOTIFY',
-    data: { text }
+export const setNotification = (text, duration) => {
+  return async dispatch => {
+    await dispatch(
+      {
+        type: 'NOTIFY',
+        data: { text }
+      }
+    )
+    setTimeout(() => {
+      dispatch(
+        {
+          type: 'CLEARNOTIFY'
+        }
+      )
+    }, duration * 1000)
   }
-)
+}
 
 export const clearNotification = () => (
   {
