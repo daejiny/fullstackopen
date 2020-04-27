@@ -5,23 +5,26 @@ const initialState = initialNotification
 const notificationReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'NOTIFY':
-      return { text: action.data.text, visible: true }
+      return { ...state, text: action.data.text, visible: true }
     case 'CLEARNOTIFY':
-      return { text: '', visible: false }
+      return { ...state, text: '', visible: false }
     default:
       return state
   }
 }
 
+let notifid = null
+
 export const setNotification = (text, duration) => {
   return async dispatch => {
+    clearTimeout(notifid)
     await dispatch(
       {
         type: 'NOTIFY',
         data: { text }
       }
     )
-    setTimeout(() => {
+    notifid = setTimeout(() => {
       dispatch(
         {
           type: 'CLEARNOTIFY'

@@ -3,12 +3,12 @@
     {
       "content": "If it hurts, do it more often",
       "id": 47145,
-      "votes": 18
+      "votes": 69
     },
     {
       "content": "Adding manpower to a late software project makes it later!",
       "id": 21149,
-      "votes": 0
+      "votes": 1
     },
     {
       "content": "The first 90 percent of the code accounts for the first 90 percent of the development time...The remaining 10 percent of the code accounts for the other 90 percent of the development time.",
@@ -33,12 +33,12 @@
     {
       "content": "Poopy!",
       "id": 6136,
-      "votes": 2
+      "votes": 3
     },
     {
       "content": "Big poopy",
       "id": 30477,
-      "votes": 6
+      "votes": 14
     },
     {
       "content": "Bigass Poopy",
@@ -49,6 +49,11 @@
       "content": "Really huge poopy",
       "id": 27094,
       "votes": 1
+    },
+    {
+      "content": "123",
+      "id": 2025,
+      "votes": 0
     }
   ]
 }
