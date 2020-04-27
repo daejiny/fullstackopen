@@ -9,8 +9,12 @@ const Filter = () => {
     const content = text
     dispatch(filterFor(content))
   }
+  const style = {
+    marginBottom: 10
+  }
+  
   return (
-    <div>filter <input name='filter' onChange={(e) => filterAnecdotes(e.target.value)} /></div>
+    <div style={style}>filter <input name='filter' onChange={(e) => filterAnecdotes(e.target.value)} /></div>
   )
 }
 

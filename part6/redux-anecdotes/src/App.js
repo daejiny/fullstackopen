@@ -1,5 +1,5 @@
 import React from 'react'
-import Filter from './components/FilterAnecdotes'
+import Filter from './components/Filter'
 import AnecdoteForm from './components/AnecdoteForm'
 import AnecdoteList from './components/AnecdoteList'
 import Notification from './components/Notification'
