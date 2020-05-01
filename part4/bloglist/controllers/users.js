@@ -9,11 +9,18 @@ usersRouter.get('/', async (req, res) => {
   res.send(users.map(user => user.toJSON()))
 })
 
+usersRouter.get('/:id', async (req, res) => {
+  const user = await User.findById(req.params.id)
+    .populate('blogs')
+
+  res.send(user.toJSON())
+})
+
 usersRouter.post('/', async (req, res) => {
   const { body } = req
 
   if (body.password.length < 3) {
-    return res.status(400).json({ error:'password too short' })
+    return res.status(400).json({ error: 'password too short' })
   }
 
   const saltRounds = 10

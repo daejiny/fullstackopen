@@ -7,13 +7,14 @@ blogsRouter.get('/', async (req, res) => {
   const blogs = await Blog.find({})
     .populate('user', { username: 1, name: 1, id: 1 })
 
-  res.send(blogs.map(blog => blog.toJSON()))
+  res.json(blogs.map(blog => blog.toJSON()))
 })
 
 blogsRouter.get('/:id', async (req, res) => {
   const blog = await Blog.findById(req.params.id)
+    .populate('user', { username: 1, name: 1, id: 1 })
 
-  res.json(blog)
+  res.json(blog.toJSON())
 })
 
 blogsRouter.post('/', async (req, res) => {
@@ -31,13 +32,28 @@ blogsRouter.post('/', async (req, res) => {
     author: body.author,
     url: body.url,
     likes: body.likes === undefined ? 0 : body.likes,
-    user: user._id
+    user: user._id,
+    comments: []
   })
   const savedBlog = await blog.save()
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 
   res.status(201).json(savedBlog.toJSON())
+})
+
+blogsRouter.get('/:id/comments', async (req, res) => {
+  const blog = await Blog.findById(req.params.id)
+
+  res.json(blog.comments)
+})
+
+blogsRouter.put('/:id/comments', async (req, res) => {
+  const blog = await Blog.findById(req.params.id)
+  blog.comments = blog.comments.concat(req.body.comment)
+  await blog.save()
+
+  res.json(blog.toJSON())
 })
 
 blogsRouter.delete('/:id', async (req, res) => {
