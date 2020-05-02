@@ -36,10 +36,13 @@ blogsRouter.post('/', async (req, res) => {
     comments: []
   })
   const savedBlog = await blog.save()
+
   user.blogs = user.blogs.concat(savedBlog._id)
   await user.save()
 
-  res.status(201).json(savedBlog.toJSON())
+  const populatedBlog = await User.populate(savedBlog, { path: 'user', model: 'User', select: { username: 1, name: 1, id: 1 } })
+
+  res.status(201).json(populatedBlog.toJSON())
 })
 
 blogsRouter.get('/:id/comments', async (req, res) => {
