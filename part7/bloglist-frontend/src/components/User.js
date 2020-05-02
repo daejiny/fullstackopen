@@ -1,8 +1,10 @@
 import React, { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { initUsers } from '../reducers/usersReducer'
+
+import { Header, Segment, Container } from 'semantic-ui-react'
 
 const User = () => {
   const dispatch = useDispatch()
@@ -19,15 +21,15 @@ const User = () => {
   if (!user) { return null }
 
   return (
-    <div>
-      <h2>{user.name}</h2>
-      <h3>added blogs</h3>
-      <ul>
+    <Container text>
+      <Header as='h1'>{user.name}</Header>
+      <Header as='h2'>Submitted blogs</Header>
+      <Segment.Group>
         {user.blogs.map(blog => {
-          return (<li key={blog.id}>{blog.title}</li>)
+          return (<Segment key={blog.id}><Link to={`/blogs/${blog.id}`}><p>{blog.title}</p></Link></Segment>)
         })}
-      </ul>
-    </div>
+      </Segment.Group>
+    </Container>
   )
 }
 

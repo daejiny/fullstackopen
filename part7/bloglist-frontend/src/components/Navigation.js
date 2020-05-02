@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux'
 
 import { logout } from '../reducers/authReducer'
 
+import { Container, Menu } from 'semantic-ui-react'
+
 const Navigation = () => {
   const dispatch = useDispatch()
   const auth = useSelector(state => state.auth)
@@ -13,19 +15,36 @@ const Navigation = () => {
   }
 
   const loggedIn = () => (
-    <div>hello {auth.name} <button onClick={() => handleLogout()} id='logout-button'>Log Out</button></div>
+    <>
+      <Menu.Item>
+        Hello, {auth.name}
+      </Menu.Item>
+      <Menu.Item position='right' as='a' href='/#' onClick={() => handleLogout()} id='logout-button'>
+        Log Out
+      </Menu.Item>
+    </>
   )
 
   const loggedOut = () => (
-    <div></div>
+    <Menu.Item position='right' as={Link} to='/login'>
+      Log In
+    </Menu.Item>
   )
 
   return (
-    <div>
-      <Link to='/blogs'>blogs</Link>
-      <Link to='/users'>users</Link>
-      {auth.token === '' ? loggedOut(): loggedIn()}
-    </div>
+    <Menu>
+      <Container>
+        <Menu.Item as={Link} to='/blogs'>
+          Blogs
+        </Menu.Item>
+
+        <Menu.Item as={Link} to='/users'>
+          Users
+        </Menu.Item>
+
+        {auth.token === '' ? loggedOut() : loggedIn()}
+      </Container>
+    </Menu>
   )
 }
 

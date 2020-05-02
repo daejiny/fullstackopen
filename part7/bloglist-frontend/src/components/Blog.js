@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
-import { deleteBlog, likeBlog, toggleVisibility, commentBlog } from '../reducers/blogReducer'
+import { deleteBlog, likeBlog, commentBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
 import { initializeBlogs } from '../reducers/blogReducer'
 
-const Blog = ({ blog }) => {
+import { Container, Form, List, Divider, Header, Button } from 'semantic-ui-react'
+
+const Blog = () => {
   const dispatch = useDispatch()
   const blogs = useSelector(state => state.blogs)
   const auth = useSelector(state => state.auth)
@@ -16,18 +18,14 @@ const Blog = ({ blog }) => {
   const { id } = useParams()
 
   useEffect(() => {
-    if (!blog) dispatch(initializeBlogs())
-  }, [dispatch, blog])
+    dispatch(initializeBlogs())
+  }, [dispatch])
 
-  if (!blog) blog = blogs.find(blog => blog.id === id)
+  const blog = blogs.find(blog => blog.id === id)
 
   if (!blog) return null
 
-  const toggleBlogInfo = () => dispatch(toggleVisibility(blog))
-
-  const showWhenVisible = { display: blog.visible ? '' : 'none' }
-
-  const handleDelete = async (blog) => {
+  const handleDelete = async () => {
     try {
       if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
         await dispatch(deleteBlog(blog))
@@ -38,7 +36,7 @@ const Blog = ({ blog }) => {
     }
   }
 
-  const handleLike = async (blog) => {
+  const handleLike = async () => {
     try {
       await dispatch(likeBlog(blog))
       dispatch(setNotification(`${blog.title} liked`, 'info'))
@@ -59,36 +57,50 @@ const Blog = ({ blog }) => {
   }
 
   return (
-    <div className='blog' style={{ border: '1px solid black', padding: '1rem', margin: '1rem' }}>
-      <Link to={`/blogs/${blog.id}`}>{blog.title}</Link> {blog.author} <button onClick={toggleBlogInfo} className='toggle-visible-button'>{blog.visible ? 'hide' : 'show'}</button>
-      <div style={showWhenVisible} className='togglableContent'>
-        URL: <a href={blog.url}>{blog.url}</a><br />
-        <div className='likes-div'>Likes: {blog.likes}<button onClick={() => handleLike(blog)} className='like-button'>like</button><br /></div>
-        User: {blog.user.name}<br />
-        <div className='delete-div'><button style={{ display: blog.user.username === auth.username ? '' : 'none' }} onClick={() => handleDelete(blog)} className='delete-button'>remove</button></div>
-        <h4>Comments</h4>
-        <ul>
-          {
-            blog.comments.map((comment, index) =>
-              <li key={index}>{comment}</li>
-            )
-          }
-        </ul>
-        <form onSubmit={handleComment}>
-          <div>
-            comment:
-            <input
-              id='commentField'
-              type="text"
-              value={commentField}
-              name="Comment Field"
-              onChange={({ target }) => setCommentField(target.value)}
-            />
-          </div>
-          <button type="submit">Add Comment</button>
-        </form>
-      </div>
-    </div>
+    <Container text className='blog'>
+      <Header as='h1'>{blog.title}</Header>
+      <Header as='h2'>By: {blog.author}</Header>
+      <p>URL: <a href={blog.url}>{blog.url}</a></p>
+      <p>User: {blog.user.name}</p>
+      <Button
+        color='blue'
+        content='Like'
+        icon='heart'
+        className='like-button'
+        onClick={handleLike}
+        label={{ basic: true, color: 'blue', pointing: 'left', content: blog.likes }}
+      />
+      <Button
+        negative
+        content='Delete'
+        className='delete-button'
+        onClick={handleDelete}
+        style={{ display: blog.user.username === auth.username ? '' : 'none' }}
+      />
+      <Divider />
+      <Header as='h4'>Comments</Header>
+      <List divided>
+        {
+          blog.comments.map((comment, index) =>
+            <List.Item key={index}>
+              <List.Icon name='right triangle' />
+              <List.Content>{comment}</List.Content>
+            </List.Item>
+          )
+        }
+      </List>
+      <Form onSubmit={handleComment}>
+        <Form.Input
+          id='comment-field'
+          type="text"
+          name="Comment Field"
+          placeholder='I love this!'
+          value={commentField}
+          onChange={(e, { value }) => setCommentField(value)}
+        />
+        <Form.Button type="submit" content='Submit Comment' />
+      </Form>
+    </Container >
   )
 }
 

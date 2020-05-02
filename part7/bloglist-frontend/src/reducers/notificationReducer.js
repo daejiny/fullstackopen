@@ -1,15 +1,14 @@
 const initialState = {
-  text: 'welcome',
+  text: '',
   type: 'info',
-  visible: false
 }
 
 const notificationReducer = (state = initialState, action) => {
   switch (action.type) {
     case 'NOTIFY':
-      return { text: action.data.text, type: action.data.type, visible: true }
+      return { text: action.data.text, type: action.data.type }
     case 'CLEAR_NOTIFICATION':
-      return { text: '', type: '', visible: false }
+      return { text: '', type: '' }
     default:
       return state
   }

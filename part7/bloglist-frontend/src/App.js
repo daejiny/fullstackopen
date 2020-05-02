@@ -15,6 +15,8 @@ import './App.css'
 
 import { initAuth } from './reducers/authReducer'
 
+import { Container } from 'semantic-ui-react'
+
 const App = () => {
   const dispatch = useDispatch()
   const auth = useSelector(state => state.auth)
@@ -23,34 +25,27 @@ const App = () => {
     dispatch(initAuth())
   }, [dispatch])
 
-  const blogList = () => {
-    return (
-      <div>
-        <h2>blogs</h2>
-        <BlogList />
-      </div>
-    )
-  }
-
   return (
     <Router>
       <Navigation />
-      <Notification />
-      {auth.token === '' && <LoginForm />}
-      <Switch>
-        <Route path="/blogs/:id">
-          <Blog />
-        </Route>
-        <Route path="/users/:id">
-          <User />
-        </Route>
-        <Route path="/users">
-          <UserList />
-        </Route>
-        <Route path="/">
-          {auth.token !== '' && blogList()}
-        </Route>
-      </Switch>
+      <Container text style={{ marginTop: '7em' }}>
+        <Notification />
+        {auth.token === '' && <LoginForm />}
+        <Switch>
+          <Route path="/blogs/:id">
+            <Blog />
+          </Route>
+          <Route path="/users/:id">
+            <User />
+          </Route>
+          <Route path="/users">
+            <UserList />
+          </Route>
+          <Route path="/">
+            {auth.token !== '' && <BlogList />}
+          </Route>
+        </Switch>
+      </Container>
     </Router>
   )
 }

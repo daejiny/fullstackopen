@@ -60,6 +60,7 @@ export const toggleVisibility = (blog) => (
 export const addBlog = (blog) => {
   return async dispatch => {
     const addedBlog = await blogService.create(blog)
+    console.log(addedBlog)
     dispatch({
       type: 'ADD',
       data: { ...addedBlog, visible: false }

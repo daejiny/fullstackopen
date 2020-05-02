@@ -1,21 +1,20 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 
+import { Message } from 'semantic-ui-react'
+
 const Notification = () => {
   const notification = useSelector(state => state.notification)
-  if ((notification === null) || (notification.text === '' || (!notification.visible))) return null
+
+  if ((notification === null) || (notification.text === '')) return null
 
   if (notification.type === 'info') {
     return (
-      <div className="notification">
-        {notification.text}
-      </div>
+      <Message positive>{notification.text}</Message>
     )
   } else if (notification.type === 'error') {
     return (
-      <div className="error">
-        {notification.text}
-      </div>
+      <Message error>{notification.text}</Message>
     )
   } else {
     return null
