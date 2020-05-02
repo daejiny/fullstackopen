@@ -1,6 +1,7 @@
 const { ApolloServer, gql } = require('apollo-server')
+const uuid = require('uuid/v1')
 
-const authors = [
+let authors = [
   {
     name: 'Robert Martin',
     id: "afa51ab0-344d-11e9-a414-719c6709cf3e",
@@ -16,22 +17,17 @@ const authors = [
     id: "afa5b6f1-344d-11e9-a414-719c6709cf3e",
     born: 1821
   },
-  { 
+  {
     name: 'Joshua Kerievsky', // birthyear not known
     id: "afa5b6f2-344d-11e9-a414-719c6709cf3e",
   },
-  { 
+  {
     name: 'Sandi Metz', // birthyear not known
     id: "afa5b6f3-344d-11e9-a414-719c6709cf3e",
   },
 ]
 
-/*
- * Saattaisi olla järkevämpää assosioida kirja ja sen tekijä tallettamalla kirjan yhteyteen tekijän nimen sijaan tekijän id
- * Yksinkertaisuuden vuoksi tallennamme kuitenkin kirjan yhteyteen tekijän nimen
-*/
-
-const books = [
+let books = [
   {
     title: 'Clean Code',
     published: 2008,
@@ -59,7 +55,7 @@ const books = [
     author: 'Joshua Kerievsky',
     id: "afa5de01-344d-11e9-a414-719c6709cf3e",
     genres: ['refactoring', 'patterns']
-  },  
+  },
   {
     title: 'Practical Object-Oriented Design, An Agile Primer Using Ruby',
     published: 2012,
@@ -84,12 +80,69 @@ const books = [
 ]
 
 const typeDefs = gql`
+  type Book {
+    title: String!
+    published: Int!
+    author: String!
+    id: ID!
+    genres: [String!]!
+  }
+
+  type Author {
+    name: String!
+    born: Int
+    id: ID!
+    bookCount: Int!
+  }
+
   type Query {
+    bookCount: Int!
+    authorCount: Int!
+    allBooks(author: String, genre: String): [Book!]!
+    allAuthors: [Author!]!
+  }
+
+  type Mutation {
+    addBook(title: String!, author: String!, published: Int!, genres: [String!]!): Book!
+    editAuthor(name: String!, setBornTo: Int!): Author
   }
 `
 
 const resolvers = {
   Query: {
+    bookCount: () => books.length,
+    authorCount: () => authors.length,
+    allAuthors: () => authors,
+    allBooks: (root, args) => {
+      let cumfilter = [...books]
+      if (args.author) cumfilter = cumfilter.filter(book => book.author === args.author)
+      if (args.genre) cumfilter = cumfilter.filter(book => book.genres.includes(args.genre))
+      return cumfilter
+    },
+  },
+  Author: {
+    bookCount: (root) => {
+      return books.reduce((acc, book) => book.author === root.name ? acc + 1 : acc, 0)
+    }
+  },
+  Mutation: {
+    addBook: (root, args) => {
+      const book = { ...args, id: uuid() }
+      books = books.concat(book)
+
+      // add previously unknown author
+      if (!authors.some(author => author.name === args.author)) authors = authors.concat({ name: args.author, id: uuid() })
+
+      return book
+    },
+    editAuthor: (root, args) => {
+      let author = authors.find(a => a.name === args.name)
+      if (author) {
+        author.born = args.setBornTo
+        return author
+      }
+      else return null
+    }
   }
 }
 
