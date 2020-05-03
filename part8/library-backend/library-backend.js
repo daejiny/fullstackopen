@@ -4,7 +4,10 @@ const Author = require('./models/author')
 const Book = require('./models/book')
 const User = require('./models/user')
 const DataLoader = require('dataloader')
+const { PubSub } = require('apollo-server')
 require('dotenv').config()
+
+const pubsub = new PubSub()
 
 let MONGODB_URI = process.env.MONGODB_URI
 
@@ -60,6 +63,10 @@ const typeDefs = gql`
     editAuthor(name: String!, setBornTo: Int!): Author
     createUser(username: String!, favoriteGenre: String!): User!
     login(username: String! password: String!): Token
+  }
+
+  type Subscription {
+    bookAdded: Book!
   }
 `
 
@@ -117,6 +124,8 @@ const resolvers = {
         })
       }
 
+      pubsub.publish('BOOK_ADDED', { bookAdded: populatedBook })
+
       return populatedBook
     },
     editAuthor: async (root, args, { currentUser }) => {
@@ -159,6 +168,11 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, JWT_SECRET) }
     }
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK_ADDED'])
+    }
   }
 }
 
@@ -182,6 +196,7 @@ const server = new ApolloServer({
   }
 })
 
-server.listen().then(({ url }) => {
+server.listen().then(({ url, subsUrl }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions ready at ${subsUrl}`)
 })
