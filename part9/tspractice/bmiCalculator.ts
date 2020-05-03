@@ -1,6 +1,6 @@
 interface ParseBmiInput {
-  value1: number;
-  value2: number;
+  height: number;
+  weight: number;
 }
 
 const parseBmiArguments = (args: Array<string>): ParseBmiInput => {
@@ -9,33 +9,34 @@ const parseBmiArguments = (args: Array<string>): ParseBmiInput => {
 
   if (!isNaN(Number(args[2])) && !isNaN(Number(args[3]))) {
     return {
-      value1: Number(args[2]),
-      value2: Number(args[3])
-    }
+      height: Number(args[2]),
+      weight: Number(args[3]),
+    };
   } else {
     throw new Error('stop silly strings');
   }
-}
+};
 
-const calculateBmi = (a: number, b: number) : string => {
-  const bmi = (a) / (b/10);
-  let print = '';
-  
-  if (bmi < 15) print = 'Very severely underweight';
-  else if (bmi >= 15 && bmi < 16) print = 'Severely underweight';
-  else if (bmi >= 16 && bmi < 18.5) print = 'Underweight';
-  else if (bmi >= 18.5 && bmi < 25) print = 'Normal (healthy weight)';
-  else if (bmi >= 25 && bmi < 30) print = 'Overweight';
-  else if (bmi >= 30 && bmi < 16) print = 'Obese Class I (Moderately obese)';
-  else if (bmi >= 35 && bmi < 35) print = 'Obese Class II (Severely obese)';
-  else if (bmi >= 40) print = 'Obese Class III (Very severely obese)';
+export const calculateBmi = (height: number, weight: number): string => {
+  const bmi = (weight) / (height / 100) ** 2;
 
-  return print;
-}
+  if (bmi < 15) return 'Very severely underweight';
+  else if (bmi >= 15 && bmi < 16) return 'Severely underweight';
+  else if (bmi >= 16 && bmi < 18.5) return 'Underweight';
+  else if (bmi >= 18.5 && bmi < 25) return 'Normal (healthy weight)';
+  else if (bmi >= 25 && bmi < 30) return 'Overweight';
+  else if (bmi >= 30 && bmi < 16) return 'Obese Class I (Moderately obese)';
+  else if (bmi >= 35 && bmi < 35) return 'Obese Class II (Severely obese)';
+  else if (bmi >= 40) return 'Obese Class III (Very severely obese)';
 
-try {
-  const {value1,value2} = parseBmiArguments(process.argv);
-  console.log(calculateBmi(value1,value2));
-} catch (e) {
-  console.log('oh no: ', e.message);
+  else throw new Error('malformatted params');
+};
+
+if (process.argv.length > 2) {
+  try {
+    const { height, weight } = parseBmiArguments(process.argv);
+    console.log(calculateBmi(height, weight));
+  } catch (e) {
+    console.log('oh no: ', e.message);
+  }
 }

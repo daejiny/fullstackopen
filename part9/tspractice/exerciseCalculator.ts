@@ -11,27 +11,27 @@ const parseExerciseArguments = (args: Array<string>): ParseExerciseInput => {
     .map(arg => {
       if (!isNaN(Number(arg))) return Number(arg);
       else throw new Error('stop silly strings');
-    })
+    });
   let target = 0;
   if (!isNaN(Number(args[2]))) target = Number(args[2]);
-  
+
   return {
     schedule,
     target
-  }
-}
+  };
+};
 
 interface Result {
-  periodLength: number,
-  trainingDays: number,
-  success: boolean,
-  rating: number,
-  ratingDescription: String,
-  target: number,
-  average: number
+  periodLength: number;
+  trainingDays: number;
+  success: boolean;
+  rating: number;
+  ratingDescription: string;
+  target: number;
+  average: number;
 }
 
-const calculateExercises = (schedule: Array<number>, target: number): Result => {
+export const calculateExercises = (schedule: Array<number>, target: number): Result => {
   const periodLength = schedule.length;
   const trainingDays = schedule.filter(hours => hours > 0).length;
   const average = schedule.reduce((acc, hours) => acc + hours, 0) / periodLength;
@@ -45,13 +45,13 @@ const calculateExercises = (schedule: Array<number>, target: number): Result => 
   const ratingDescription = function () {
     switch (rating) {
       case 3:
-        return 'hehe doing good'
+        return 'hehe doing good';
       case 2:
-        return 'meh'
+        return 'meh';
       case 1:
-        return 'cmon wtf'
+        return 'cmon wtf';
       default:
-        return 'idk lol'
+        return 'idk lol';
     }
   }();
   return {
@@ -62,12 +62,14 @@ const calculateExercises = (schedule: Array<number>, target: number): Result => 
     rating,
     ratingDescription,
     target
-  }
-}
+  };
+};
 
-try {
-  const { schedule, target } = parseExerciseArguments(process.argv);
-  console.log(calculateExercises(schedule, target));
-} catch (e) {
-  console.log('oh no: ', e.message);
+if (process.argv.length > 2) {
+  try {
+    const { schedule, target } = parseExerciseArguments(process.argv);
+    console.log(calculateExercises(schedule, target));
+  } catch (e) {
+    console.log('oh no: ', e.message);
+  }
 }
