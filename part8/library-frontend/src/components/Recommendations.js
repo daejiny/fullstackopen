@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from 'react'
-import { useLazyQuery } from '@apollo/client'
-import { ALL_BOOKS } from '../queries'
+import { useLazyQuery, useQuery } from '@apollo/client'
 
-var _ = require('lodash');
+import { ALL_BOOKS, FAV_GENRE } from '../queries'
 
 
-const Books = (props) => {
+const Recommendations = (props) => {
+  const result = useQuery(FAV_GENRE)
   const [books, setBooks] = useState(null)
   const [getBooks, { loading, data }] = useLazyQuery(ALL_BOOKS, { options: { fetchPolicy: 'cache-and-network' } })
 
   const [genre, setGenre] = useState('')
-  const [genres, setGenres] = useState([])
 
   useEffect(() => {
+    if (result.data) setGenre(result.data.me.favoriteGenre)
     getBooks({ variables: { genre: genre } })
 
     if (data && data.allBooks) {
       setBooks(data.allBooks)
-      if (!genres.length) setGenres(_.chain(books).flatMap('genres').uniq().value())
     }
-  }, [getBooks, data, genre, books, genres])
+  }, [getBooks, data, genre, books, result])
 
   if (!props.show) {
     return null
@@ -31,10 +30,8 @@ const Books = (props) => {
 
   return (
     <div>
-      <h2>books</h2>
-      <h3>filtering by {genre}</h3>
-      {genres.map((g, i) => <button key={i} onClick={() => setGenre(g)}>{g}</button>)}
-      <button onClick={() => setGenre('')}>All</button>
+      <h2>recommendations</h2>
+      <h3>books in your favorite genre {genre}</h3>
       <table>
         <tbody>
           <tr>
@@ -63,4 +60,4 @@ const Books = (props) => {
   )
 }
 
-export default Books
+export default Recommendations
