@@ -1,5 +1,5 @@
 import { v4 as uuid } from 'uuid';
-import data from '../../data/patients.json';
+import data from '../../data/patients';
 
 import { Patient, PublicPatient, NewPatient } from '../types';
 import toNewPatient from '../utils';
@@ -7,7 +7,6 @@ import toNewPatient from '../utils';
 const patientData: Patient [] = data.map(obj => {
   const object = toNewPatient(obj) as Patient;
   object.id = obj.id;
-  object.entries = [];
   return object;
 });
 
