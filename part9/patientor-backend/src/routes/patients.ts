@@ -19,13 +19,14 @@ router.get('/', (_req, res) => {
 });
 
 router.post('/', (req, res) => {
-  const { name, ssn, gender, occupation, dateOfBirth} = req.body;
+  const { name, ssn, gender, occupation, dateOfBirth, entries } = req.body;
   const newPatient = patientService.addEntry({
     name,
     dateOfBirth,
     ssn,
     gender,
-    occupation
+    occupation,
+    entries,
   });
   res.json(newPatient);
 });

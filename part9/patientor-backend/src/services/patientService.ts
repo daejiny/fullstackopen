@@ -1,12 +1,13 @@
 import { v4 as uuid } from 'uuid';
 import data from '../../data/patients.json';
 
-import { Patient, ProtectedPatient, NewPatient } from '../types';
+import { Patient, PublicPatient, NewPatient } from '../types';
 import toNewPatient from '../utils';
 
 const patientData: Patient [] = data.map(obj => {
   const object = toNewPatient(obj) as Patient;
   object.id = obj.id;
+  object.entries = [];
   return object;
 });
 
@@ -14,17 +15,18 @@ const getEntries = (): Patient[] => {
   return patientData;
 };
 
-const getProtectedEntries = (): ProtectedPatient[] => {
-  return patientData.map(({ id, name, dateOfBirth, gender, occupation }) => ({
+const getProtectedEntries = (): PublicPatient[] => {
+  return patientData.map(({ id, name, dateOfBirth, gender, occupation, entries }) => ({
     id,
     name,
     dateOfBirth,
     gender,
     occupation,
+    entries,
   }));
 };
 
-const findById = (id: string): ProtectedPatient | undefined => {
+const findById = (id: string): PublicPatient | undefined => {
   const foundPatient = patientData.find(patient => patient.id === id);
   if (foundPatient) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
