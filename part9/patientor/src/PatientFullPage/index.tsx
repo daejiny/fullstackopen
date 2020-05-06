@@ -1,21 +1,30 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Container, Header, Icon, Item, List } from "semantic-ui-react";
+import { Container, Header, Icon, Item, List, Button } from "semantic-ui-react";
 
 import { Patient, Entry, Diagnosis } from "../types";
 import { apiBaseUrl } from "../constants";
-import { useStateValue } from "../state";
+import { useStateValue, updatePatient } from "../state";
 import { useParams } from "react-router-dom";
 import HealthRatingBar from "../components/HealthRatingBar";
+import { EntryFormValues } from "../AddEntryModal/AddEntryForm";
+import AddEntryModal from "../AddEntryModal";
 
 const PatientFullPage: React.FC = () => {
-  // const [{ patients }, dispatch] = useStateValue();
-  const [{ patients, diagnoses }] = useStateValue();
+  const [{ patients, diagnoses }, dispatch] = useStateValue();
   const [patient, setPatient] = useState<Patient>();
 
   const { id } = useParams<{ id: string }>();
 
-  // const [error, setError] = React.useState<string | undefined>();
+  const [modalOpen, setModalOpen] = React.useState<boolean>(false);
+  const [error, setError] = React.useState<string | undefined>();
+
+  const openModal = (): void => setModalOpen(true);
+
+  const closeModal = (): void => {
+    setModalOpen(false);
+    setError(undefined);
+  };
 
   const getPatient = async () => {
     if (!Object.keys(patients).includes(id)) {
@@ -29,6 +38,22 @@ const PatientFullPage: React.FC = () => {
   useEffect(() => {
     getPatient();
   });
+
+  const submitNewEntry = async (values: EntryFormValues) => {
+    if (!patient) return null;
+    try {
+      const { data: updatedPatient } = await axios.post<Patient>(
+        `${apiBaseUrl}/patients/${patient.id}/entries`,
+        values
+      );
+      dispatch(updatePatient(updatedPatient));
+      closeModal();
+    } catch (e) {
+      console.error(e.response.data);
+      setError(e.response.data.error);
+    }
+  };
+
   if (!patient) {
     return <Header as='h2'>Person not found</Header>;
   }
@@ -59,6 +84,7 @@ const PatientFullPage: React.FC = () => {
           <Item>
             <Item.Content>
               <Item.Header as='h3'>{entry.date} <Icon name='hospital' /></Item.Header>
+              <Item.Meta>Discharged {entry.discharge.date}: {entry.discharge.criteria}</Item.Meta>
               <Item.Description>{entry.description}</Item.Description>
               <Item.Extra>{entry.diagnosisCodes && <DiagnosesList dinput={entry.diagnosisCodes} />}</Item.Extra>
             </Item.Content>
@@ -70,6 +96,8 @@ const PatientFullPage: React.FC = () => {
           <Item>
             <Item.Content>
               <Item.Header as='h3'>{entry.date} <Icon name='user md' /></Item.Header>
+              {entry.employerName && <Item.Meta>Employer: {entry.employerName}</Item.Meta>}
+              {entry.sickLeave && <Item.Meta>Sick leave from {entry.sickLeave.startDate} to {entry.sickLeave.endDate}</Item.Meta>}
               <Item.Description>{entry.description}</Item.Description>
               <Item.Extra>{entry.diagnosisCodes && <DiagnosesList dinput={entry.diagnosisCodes} />}</Item.Extra>
             </Item.Content>
@@ -82,7 +110,6 @@ const PatientFullPage: React.FC = () => {
             <Item.Content>
               <Item.Header as='h3'>{entry.date} <Icon name='stethoscope' /></Item.Header>
               <Item.Description>{entry.description}</Item.Description>
-              {/* <Item.Extra>{entry.diagnosisCodes && <DiagnosesList dinput={entry.diagnosisCodes} />}</Item.Extra> */}
               <Item.Extra><HealthRatingBar rating={entry.healthCheckRating} showText={true} /></Item.Extra>
             </Item.Content>
           </Item>
@@ -126,6 +153,13 @@ const PatientFullPage: React.FC = () => {
         <Header as='h1'>{patient.name} <GenderIcon /></Header>
         <p>occupation: {patient.occupation}</p>
         <Header as='h2'>entries</Header>
+        <AddEntryModal
+          modalOpen={modalOpen}
+          onSubmit={submitNewEntry}
+          error={error}
+          onClose={closeModal}
+        />
+        <Button onClick={() => openModal()}>Add Entry</Button>
         <EntryList entries={patient.entries} />
       </Container>
 

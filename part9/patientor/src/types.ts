@@ -61,3 +61,31 @@ export interface Patient {
   dateOfBirth?: string;
   entries: Entry[];
 }
+
+
+// ugliest code i ever wrote 🤮
+export interface FormEntry {
+  type: 'Hospital' | 'HealthCheck' | 'OccupationalHealthcare';
+  date: string;
+  description: string;
+  specialist: string;
+  diagnosisCodes?: Array<Diagnosis['code']>;
+  sickLeave?: {
+    startDate: string;
+    endDate: string;
+  };
+  employerName?: string;
+  discharge?: {
+    date: string;
+    criteria: string;
+  };
+  healthCheckRating?: HealthCheckRating;
+}
+
+// export type NewHospitalEntry = Omit<HospitalEntry, 'id'>;
+// export type NewHealthCheckEntry = Omit<HealthCheckEntry, 'id'>;
+// export type NewOccupationalHealthcareEntry = Omit<OccupationalHealthcareEntry, 'id'>;
+// export type NewEntry =
+//   | NewHospitalEntry
+//   | NewHealthCheckEntry
+//   | NewOccupationalHealthcareEntry;
